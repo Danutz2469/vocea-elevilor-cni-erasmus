@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <title>Vocea Elevilor | CNI Piatra Neamț</title>
+    <link rel="icon" type="image/png" href="logo-scoala.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="star-animation-container"></div> 
+    <header>
+        <div class="navbar">
+            <div class="logo-area">
+                <img src="logo-scoala.png" alt="Logo">
+                Vocea Elevilor
+            </div>
+            <div class="burger" onclick="toggleMenu()">☰</div>
+            <div class="nav-menu" id="mainMenu">
+                <button id="langToggle" onclick="toggleLanguage()" class="nav-btn" style="border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 5px 15px; font-weight: bold; background: rgba(255,255,255,0.1);">🌍 EN</button>
+                <button class="nav-btn active" onclick="switchView('acasa', this)" data-i18n="navHome">Acasă</button>
+                <button class="nav-btn" onclick="switchView('sesizari', this)" data-i18n="navReport">Sesizări</button>
+                <button class="nav-btn" onclick="switchView('anunturi', this)" data-i18n="navAnnounce">Anunțuri</button>
+                <button class="nav-btn" onclick="switchView('sondaj', this)" data-i18n="navPoll">Sondaj</button>
+                <button class="nav-btn" onclick="switchView('resurse', this)" data-i18n="navResources">Resurse</button>
+                <button class="nav-btn" onclick="switchView('regulament', this)" data-i18n="navRules">Regulament</button>
+                <button class="nav-btn admin-btn" id="btnAdminAuth" onclick="toggleAdminAuth()">Admin</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div id="view-acasa" class="view-section active-view">
+            <div class="card revealed">
+                <h2 style="border-bottom:none; margin-bottom:10px;">
+                    <span data-i18n="welcomeTitle">👋 Bine ați venit!</span>
+                </h2>
+                <p style="font-size: 1.1rem; line-height: 1.6;" data-i18n="welcomeText">
+                    Aceasta este platforma centralizată a Consiliului Elevilor <strong>CNI Piatra Neamț</strong>. 
+                    Aici poți afla ultimele noutăți, poți vota în sondaje și poți trimite sesizări anonime pentru a îmbunătăți viața școlară.
+                </p>
+                <p style="color:var(--muted); margin-top:5px;" data-i18n="welcomeSub">Folosiți meniul de sus pentru a naviga.</p>
+            </div>
+
+            <div class="card">
+                <h2 style="color: var(--acad-color);" data-i18n="calendarTitle">📅 Calendar Evenimente Școlare</h2>
+                <div id="calendarDisplay"></div>
+            </div>
+        </div>
+
+        <div id="view-sondaj" class="view-section">
+            <div class="card" id="pollCard">
+                <h2 style="color: var(--sugestii-color);" data-i18n="pollTitle">📊 Sondaj Rapid: Părerea Ta Contează</h2>
+                <h3 id="pollQuestionDisplay" style="color: #333; margin-bottom: 20px; font-weight:700;">Întrebare sondaj...</h3>
+                
+                <div id="pollOptionsDisplay" class="poll-options"></div>
+
+                <div id="pollResultsDisplay" class="poll-results" style="display: none; margin-top: 20px;"></div>
+                
+                <button id="btnVote" class="submit-btn" style="margin-top:20px; background:var(--sugestii-color);" onclick="submitVote()" data-i18n="pollBtn">Votează</button>
+            </div>
+        </div>
+
+        <div id="view-resurse" class="view-section">
+            <div class="card">
+                <h2 style="color: var(--resurse-color);" data-i18n="resTitle">🔗 Resurse și Linkuri Utile</h2>
+                <ul style="line-height: 1.8; font-size: 1.05rem;">
+                    <li data-i18n="res1"><strong>Program secretariat:</strong> 08:00 - 16:00.</li>
+                    <li data-i18n="res3"><strong>Link util:</strong> <a href="https://edu.ro" target="_blank" style="color: var(--primary); text-decoration:none;">🌐 Site-ul Ministerului Educației</a></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 style="color: var(--sugestii-color);" data-i18n="sugTitle">💡 Sugestii pentru îmbunătățirea școlii</h2>
+                <p data-i18n="sugSub">Ai o idee bună? Spune-ne!</p>
+                <form onsubmit="submitSuggestion(event)">
+                    <div class="form-group">
+                        <label data-i18n="sugName">Nume (Opțional)</label>
+                        <input type="text" id="sugestieNume" placeholder="Anonim" data-i18n-ph="phName">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="sugEmail">Email (Opțional - pentru răspuns)</label>
+                        <input type="email" id="sugestieEmail" placeholder="email@exemplu.ro" data-i18n-ph="phEmail">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="sugIdea">Ideea ta</label>
+                        <textarea id="sugestieText" rows="4" placeholder="Descrie ideea..." required data-i18n-ph="phIdea"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: var(--sugestii-color);" data-i18n="sugBtn">Trimite Sugestia</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-anunturi" class="view-section">
+            <div class="card">
+                <h2 style="color: var(--resurse-color);" data-i18n="annTitle">📢 Anunțuri Oficiale</h2>
+                <div id="announcementsDisplay">
+                    <p style="color: #666;">Nu sunt anunțuri momentan.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-regulament" class="view-section">
+            <div class="card">
+                <h2 style="color: var(--primary);" data-i18n="regTitle">📚 Regulament Intern și Recomandări Detaliate</h2>
+                <p data-i18n="regIntro">Acest document este un extras din Regulamentul de Organizare și Funcționare a Unității de Învățământ (ROFUIP) și conține recomandări esențiale pentru un mediu școlar pozitiv, adaptat proiectului <strong>"Vocea Elevilor"</strong>. Cunoașterea acestor reguli este obligatorie.</p>
+
+                <h3 style="color: var(--accent); margin-top: 30px; border-left: 5px solid #dbeafe; padding-left: 10px;" data-i18n="regSec1">1. 🤝 Reguli Generale de Comportament și Consecințe</h3>
+                
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub1_1">Respect și Responsabilitate</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi1_1_1"><strong>Respectul:</strong> Tratează toți elevii, profesorii și personalul școlii cu <strong>respect</strong>, evitând orice formă de discriminare sau atitudine ofensatoare.</li>
+                    <li data-i18n="regLi1_1_2"><strong>Integrarea:</strong> Încurajează un mediu <strong>inclusiv</strong>. Orice act de izolare sau marginalizare a unui coleg este interzis.</li>
+                    <li data-i18n="regLi1_1_3"><strong>Proprietatea Școlii:</strong> Ești responsabil pentru păstrarea curățeniei și integrității bunurilor școlii (mobilier, pereți, echipamente). Deteriorarea lor atrage <strong>sancțiuni și obligația de a repara/înlocui</strong>.</li>
+                </ul>
+
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub1_2">Prezență și Sancțiuni</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi1_2_1"><strong>Punctualitatea:</strong> Se impune intrarea în clasă înainte de sunetul de începere a orei. Întârzierile repetate vor fi sancționate.</li>
+                    <li data-i18n="regLi1_2_2"><strong>Absențele:</strong> Peste <strong>10 absențe nemotivate</strong> pe semestru atrag scăderea notei la purtare (clasa a IX-a și următoarele).</li>
+                    <li data-i18n="regLi1_2_3"><strong>Sancțiuni Disciplinare:</strong> Abaterile grave (ex: violență fizică/verbală, fraudă la evaluări) pot fi sancționate cu <strong>mustrare scrisă</strong>, <strong>mutarea disciplinară</strong> la o altă clasă/școală sau chiar <strong>exmatricularea</strong> (conform ROFUIP).</li>
+                </ul>
+
+                <div style="background-color: #fff7ed; border: 1px solid #fed7aa; padding: 15px; border-radius: 8px; margin-top: 20px; color: #b45309;" data-i18n="regAlert">
+                    <strong>Atenție!</strong> Orice fraudă sau tentativă de fraudă la lucrările scrise sau evaluările orale atrage nota 4 (patru) la disciplină, indiferent de rezultat.
+                </div>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #e2e8f0;">
+
+                <h3 style="color: var(--accent); margin-top: 30px; border-left: 5px solid #dbeafe; padding-left: 10px;" data-i18n="regSec2">2. 🚨 Sănătate, Siguranță și Anti-Bullying</h3>
+                
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub2_1">Securitatea Spațiului Școlar</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi2_1_1"><strong>Substanțe Interzise:</strong> Este <strong>strict interzisă</strong> introducerea și consumul de alcool, droguri, tutun (inclusiv țigări electronice) și substanțe periculoase în perimetrul școlii.</li>
+                    <li data-i18n="regLi2_1_2"><strong>Echipamentele:</strong> Accesul în spațiile cu risc (laboratoare speciale, ateliere) se face doar sub <strong>supravegherea strictă</strong> a personalului.</li>
+                    <li data-i18n="regLi2_1_3"><strong>Evacuarea:</strong> În caz de urgență (incendiu, cutremur), elevii sunt obligați să urmeze imediat <strong>planul de evacuare</strong> și instrucțiunile profesorului.</li>
+                </ul>
+
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub2_2">Politica Anti-Bullying (Toleranță Zero)</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi2_2_1"><strong>Definiție Extinsă:</strong> Bullying-ul include nu doar agresiunea fizică sau verbală, dar și <strong>amenințarea</strong>, <strong>hărțuirea sexuală</strong>, <strong>cyberbullying-ul</strong> (mesaje sau postări online) și <strong>furtul</strong>.</li>
+                    <li data-i18n="regLi2_2_2"><strong>Raportare:</strong> Dacă ești victimă sau martor, utilizează secțiunea <strong>"Bullying (Anonim)"</strong> din aplicația "Vocea Elevilor". Informațiile tale ajung direct la consilierul școlar, care va demara ancheta <strong>fără a-ți dezvălui identitatea</strong>.</li>
+                </ul>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #e2e8f0;">
+
+                <h3 style="color: var(--accent); margin-top: 30px; border-left: 5px solid #dbeafe; padding-left: 10px;" data-i18n="regSec3">3. 💻 Eticheta Digitală (Digital Etiquette)</h3>
+
+                <p style="color: #333; font-size: 15px;" data-i18n="regSub3_0">Utilizarea responsabilă a tehnologiei este esențială. Iată regulile de bază:</p>
+                
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub3_1">Reguli privind Telefoanele Mobile</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi3_1_1"><strong>În Timpul Ore:</strong> Telefoanele trebuie să fie puse pe <strong>mod silențios</strong> și păstrate în ghiozdan sau la locul desemnat. Utilizarea lor în scopuri non-educative în timpul orei este interzisă.</li>
+                    <li data-i18n="regLi3_1_2"><strong>În Pauze:</strong> Utilizarea lor este permisă, dar nu trebuie să deranjeze activitățile celorlalți sau să fie folosită pentru a înregistra, fotografia sau filma colegii/profesorii fără acordul explicit.</li>
+                </ul>
+
+                <h4 style="color: var(--primary); margin-top: 20px;" data-i18n="regSub3_2">Utilizarea Platformelor Online</h4>
+                <ul style="color: #333; font-size: 15px; margin-bottom: 20px; padding-left: 20px;">
+                    <li data-i18n="regLi3_2_1"><strong>Conturi Educaționale:</strong> Păstrează-ți conturile de email și platformele educaționale (ex: Google Classroom, Teams) <strong>securizate</strong> și nu partaja parola cu nimeni.</li>
+                    <li data-i18n="regLi3_2_2"><strong>Limbajul Online:</strong> Comportamentul civilizat din clasă se aplică și în grupurile de chat sau pe platformele școlii. Evită *spam*-ul, *flaming*-ul (postări agresive) sau distribuirea de conținut neadecvat.</li>
+                    <li data-i18n="regLi3_2_3"><strong>Cyberbullying:</strong> Orice act de cyberbullying (publicarea de secrete, imagini compromițătoare, mesaje de ură) este tratat cu aceeași <strong>gravitate</strong> ca bullying-ul din viața reală.</li>
+                </ul>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #e2e8f0;">
+
+                <h3 style="color: var(--accent); margin-top: 30px; border-left: 5px solid #dbeafe; padding-left: 10px;" data-i18n="regSec4">4. 🧠 Recomandări și Sfaturi de Studiu</h3>
+                
+                <p style="color: #333; font-size: 15px;" data-i18n="regSub4_0">Aceste sfaturi te pot ajuta să îți îmbunătățești performanța:</p>
+                
+                <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; padding: 15px; border-radius: 8px; margin-top: 20px; color: #065f46;">
+                    <strong data-i18n="regSub4_1">Sfaturi Academice Esențiale:</strong>
+                    <ul style="color: #333; font-size: 15px; margin-top: 10px; margin-bottom: 0; padding-left: 20px;">
+                        <li data-i18n="regLi4_1_1"><strong>Echilibrul:</strong> Alocă timp atât pentru studiu, cât și pentru odihnă și activități extrașcolare.</li>
+                        <li data-i18n="regLi4_1_2"><strong>Recuperarea:</strong> Dacă ai dificultăți la o materie, folosește secțiunea <strong>"Academice"</strong> din aplicație pentru a solicita sprijin suplimentar (ore remediale, consultații).</li>
+                        <li data-i18n="regLi4_1_3"><strong>Colaborarea:</strong> Formează grupuri de studiu constructive cu colegii, dar asigură-te că nu copiați, ci vă ajutați reciproc la înțelegere.</li>
+                    </ul>
+                </div>
+
+                <p style="text-align: right; margin-top: 30px; font-size: 14px; color: #6b7280;" data-i18n="regFooter">Document adaptat și actualizat: Decembrie 2025.</p>
+            </div>
+        </div>
+
+        <div id="view-sesizari" class="view-section">
+            
+            <div class="card" id="problemCard">
+                <h2 style="color: var(--probleme-color);" data-i18n="probTitle">⚠️ Raportează o problemă în școală</h2>
+                <form onsubmit="submitProblem(event)">
+                    <div class="form-group">
+                        <label data-i18n="probLoc">Locație</label>
+                        <input type="text" id="probLocatie" placeholder="Ex: Sala 204, etaj 1" style="font-size: 1.1rem; padding: 15px;" required data-i18n-ph="phLoc">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="probType">Tip Problemă</label>
+                        <select id="probTip">
+                            <option data-i18n="probOpt1">Mobilier rupt</option>
+                            <option data-i18n="probOpt2">Curățenie</option>
+                            <option data-i18n="probOpt3">Iluminat/Electrice</option>
+                            <option data-i18n="probOpt4">Altele</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="probDesc">Descriere</label>
+                        <textarea id="probDesc" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="probPic">Adaugă Poze (Opțional)</label>
+                        <input type="file" id="probPoze" multiple accept="image/*">
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: var(--probleme-color);" data-i18n="probBtn">Trimite Raportare</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 style="color: var(--bullying-color);" data-i18n="bullTitle">🛡️ Raportare Bullying (Anonim)</h2>
+                <form onsubmit="submitBullying(event)">
+                    <div class="form-group">
+                        <label data-i18n="bullDesc">Ce s-a întâmplat?</label>
+                        <textarea id="bullDesc" rows="4" placeholder="Descrie situația..." required data-i18n-ph="phDesc"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="bullDet">Detalii (Loc, oră - opțional)</label>
+                        <input type="text" id="bullDetalii">
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: var(--bullying-color);" data-i18n="bullBtn">Trimite Anonim</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 style="color: var(--acad-color);" data-i18n="acadTitle">🎓 Probleme Academice / Sprijin</h2>
+                <form onsubmit="submitAcademic(event)">
+                    <div class="form-group">
+                        <label data-i18n="acadType">Tip problemă</label>
+                        <select id="acadTipSelect" required>
+                            <option value="" disabled selected data-i18n="acadOpt0">Selectează un tip de problemă</option>
+                            <option value="Materiale didactice" data-i18n="acadOpt1">Lipsă materiale didactice</option>
+                            <option value="Evaluare subiectivă" data-i18n="acadOpt2">Probleme evaluare subiectivă</option>
+                            <option value="Relatie Profesor" data-i18n="acadOpt3">Relație dificilă cu un profesor</option>
+                            <option value="Suport Consiliere" data-i18n="acadOpt4">Nevoie de suport/consiliere educațională</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="acadDesc">Descriere/Detalii</label>
+                        <textarea id="acadDesc" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: var(--acad-color);" data-i18n="acadBtn">Trimite Solicitare</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="admin-dashboard">
+            <div class="card" style="border-left:none; box-shadow:none; background:none; padding:0;">
+                <div class="admin-header">
+                    <h3 style="margin:0; color:white;" data-i18n="adminTitle">🔧 PANOU ADMINISTRARE</h3>
+                    <div style="display:flex; gap: 10px;">
+                        <button class="btn-small" onclick="adminDeleteAllData()" style="background:#8b5cf6; border:1px solid rgba(255,255,255,0.5);" data-i18n="adminDelAll">Șterge TOATE Datele</button>
+                        <button class="btn-small" onclick="logoutAdmin()" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.5);" data-i18n="adminLogout">Deconectare</button>
+                    </div>
+                </div>
+
+                <div style="padding: 20px; background: white; border-radius: 0 0 12px 12px;">
+                    
+                    <div class="admin-grid-top">
+                        <div class="admin-grid-card">
+                            <h4 style="margin-top:0; color: var(--primary);" data-i18n="adminAddPub"><i style="font-style:normal; margin-right:5px;">✍️</i> Adaugă Conținut Public</h4>
+                            <div class="form-group">
+                                <select id="adminPostType">
+                                    <option value="anunt" data-i18n="adminOptAnn">Anunț Oficial</option>
+                                    <option value="calendar" data-i18n="adminOptCal">Eveniment Calendar</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="adminPostTitle" placeholder="Titlu..." data-i18n-ph="phTitle">
+                            </div>
+                            <div class="form-group">
+                                <input type="date" id="adminPostDate">
+                            </div>
+                            <div class="form-group">
+                                <textarea id="adminPostContent" placeholder="Conținut..." data-i18n-ph="phContent" rows="3"></textarea>
+                            </div>
+                            <button onclick="adminPostContent()" class="submit-btn" data-i18n="adminPostBtn">Publică</button>
+                        </div>
+
+                        <div class="admin-grid-card">
+                            <h4 style="margin-top:0; color: var(--sugestii-color);" data-i18n="adminPollTitle"><i style="font-style:normal; margin-right:5px;">📊</i> Gestionează Sondajul Public</h4>
+                            <div class="form-group">
+                                <label data-i18n="adminPollQ">Întrebarea Sondajului</label>
+                                <input type="text" id="adminPollQuestion" placeholder="Introduceți întrebarea..." data-i18n-ph="phPollQ">
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="adminPollOpt">Opțiuni (Câte una pe rând nou)</label>
+                                <textarea id="adminPollOptions" rows="4" placeholder="Ex: Opțiunea 1\nOpțiunea 2\nOpțiunea 3" data-i18n-ph="phPollOpt"></textarea>
+                            </div>
+                            <button onclick="adminUpdatePoll()" class="submit-btn" style="background:var(--sugestii-color);" data-i18n="adminPollBtn">Actualizează Sondaj</button>
+                            <button onclick="adminResetPollVotes()" class="btn-small" style="background:var(--probleme-color); margin-top:10px; width:100%; padding: 10px;" data-i18n="adminPollReset">Resetează Voturi</button>
+                        </div>
+                    </div>
+
+                    <div class="admin-grid-card" style="margin-bottom: 30px;">
+                        <h4 style="margin-top:0; color:var(--probleme-color)" data-i18n="adminStatTitle"><i style="font-style:normal; margin-right:5px;">📈</i> Stadiu Rezolvare Sesizări Probleme</h4>
+                        <div class="progress-bar-bg">
+                            <div id="problemeProgressBar" class="progress-bar-fill" style="width:0%">0%</div>
+                        </div>
+                        <p id="countsSpan" style="font-size: 0.95rem; font-weight: bold; color: var(--primary); margin-top: 8px; text-align: right;"></p>
+                    </div>
+
+                    <div class="admin-lists-container">
+                        <div>
+                            <h4 style="color:var(--probleme-color)" data-i18n="adminProb">⚠️ Sesizări Probleme</h4>
+                            <div id="adminListProbleme"></div>
+                            
+                            <h4 style="color:var(--sugestii-color); margin-top: 30px;" data-i18n="adminSug">💡 Sugestii Primite</h4>
+                            <div id="adminListSugestii"></div>
+                            
+                            <h4 style="color:var(--bullying-color); margin-top: 30px;" data-i18n="adminBull">🛡️ Rapoarte Bullying</h4>
+                            <div id="adminListBullying"></div>
+                        </div>
+                        <div>
+                            <h4 style="color:var(--acad-color)" data-i18n="adminAcad">🎓 Solicitări Academice</h4>
+                            <div id="adminListAcad"></div>
+                            
+                            <h4 style="color:var(--resurse-color); margin-top: 30px;" data-i18n="adminAnn">📢 Anunțuri Oficiale</h4>
+                            <div id="adminListAnunturi"></div>
+                            
+                            <h4 style="color:var(--resurse-color); margin-top: 30px;" data-i18n="adminCal">📅 Evenimente Calendar</h4>
+                            <div id="adminListCalendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast"></div> 
+
+    <footer>
+        <div class="star-badge-footer" onclick="burstStarAnimation(event)">★</div>
+        <p data-i18n="footer1">Vocea Elevilor — Proiect Erasmus+ | CNI Piatra Neamț</p>
+        <p style="margin-top:5px;" data-i18n="footer2">Dezvoltat de <strong>SEZONOV DANIEL-ADAM</strong></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
